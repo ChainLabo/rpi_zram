@@ -1,10 +1,12 @@
+#! /usr/bin/bash
 # rpi_zram install
+DOWNLOAD_URL="https://raw.githubusercontent.com/ChainLabo/rpi_zram/master/zram.sh"
 
 #Download the script and copy to /usr/bin/ folder
-sudo wget -O /usr/bin/zram.sh https://raw.githubusercontent.com/novaspirit/rpi_zram/master/zram.sh
+sudo wget -O /usr/local/bin/zram.sh $DOWNLOAD_URL
 
 #make file executable
-sudo chmod +x /usr/bin/zram.sh
+sudo chmod +x /usr/local/bin/zram.sh
 
 #add line before exit 0
 #sudo vi /etc/rc.local -c 'normal GO/usr/bin/zram.sh &' -c ':wq'
@@ -19,7 +21,7 @@ Description=zram Service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/zram.sh
+ExecStart=/usr/local/bin/zram.sh
 
 [Install]
 WantedBy=multi-user.target

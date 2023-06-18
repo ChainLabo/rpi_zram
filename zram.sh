@@ -6,13 +6,13 @@ cores=$(nproc --all)
 
 # disable zram
 core=0
-while [ $core -lt $cores ]; do
+while [ $core -lt "$cores" ]; do
     if [[ -b /dev/zram$core ]]; then
         swapoff /dev/zram$core
     fi
-    let core=core+1
+    (( core++ )) || true
 done
-if [[ -n $(lsmod | grep zram) ]]; then
+if lsmod | grep -q zram ; then
     rmmod zram
 fi
 if [[ $1 == stop ]]; then
@@ -23,18 +23,14 @@ fi
 swapoff -a
 
 # enable zram
-modprobe zram num_devices=$cores
-
-echo lz4 > /sys/block/zram0/comp_algorithm
-
-totalmem=$(free | grep -e "^Mem:" | awk '{print $2}')
-#mem=$(( ($totalmem / $cores)* 1024 ))
-mem=$(( $totalmem * 1024 ))
+modprobe zram num_devices="$cores"
+mem=$(free | awk -v cores="$cores" '/^Mem:/{ printf "%i",($2 * 1024 / 1) }')
 
 core=0
-while [ $core -lt $cores ]; do
-    echo $mem > /sys/block/zram$core/disksize
+while [ $core -lt "$cores" ]; do
+    echo lz4 > /sys/block/zram$core/comp_algorithm
+    echo "$mem" > /sys/block/zram$core/disksize
     mkswap /dev/zram$core
     swapon -p 5 /dev/zram$core
-    let core=core+1
+    (( core++ )) || true
 done
