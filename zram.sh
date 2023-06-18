@@ -28,7 +28,7 @@ swapoff -a
 
 # enable zram
 modprobe zram num_devices="$cores"
-mem=$(free | awk -v cores="$cores" '/^Mem:/{ printf "%i",($2 * 1024 / $cores) }')
+mem=$(free | awk -v cores="$cores" '/^Mem:/{ printf "%i",($2 * 1024 / cores) }')
 
 core=0
 while [ $core -lt "$cores" ]; do
